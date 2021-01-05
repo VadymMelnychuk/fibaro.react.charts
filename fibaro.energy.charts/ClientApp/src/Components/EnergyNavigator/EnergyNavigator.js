@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default props => {
     const classes = useStyles();
-    let { data } = props;
+    let { data, onSelected } = props;
     //const initialOpens = {};
     const initialOpens = data.reduce((res, d) => { res[d.id] = true; return res; }, {});
 
@@ -49,7 +49,10 @@ export default props => {
                                             button 
                                             className={classes.nested} 
                                             selected={selected===d.id} 
-                                            onClick={() => setSelected(d.id)}>
+                                            onClick={() => {
+                                                setSelected(d.id);
+                                                onSelected(d.id);
+                                            }}>
                                             <ListItemText primary={d.name} />
                                         </ListItem>
                                     )

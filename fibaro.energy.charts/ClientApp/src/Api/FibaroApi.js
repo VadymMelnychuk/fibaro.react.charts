@@ -11,4 +11,13 @@ export default class FibaroApi extends BaseApi {
 
         return this.Query(data, "/fibaro");
     }
+
+    GetEnergyData(from, to, deviceId) {
+        let data = {
+            url: Endpoints.Energy.Power.replace('{from}', from).replace('{to}', to).replace('{deviceId}', deviceId),
+            method: "GET"
+        }
+
+        return this.Query(data, "/fibaro")
+    }
 };

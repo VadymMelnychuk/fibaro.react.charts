@@ -11,6 +11,7 @@ export default props => {
     //const [interfaceData, setInterfaceData] = React.useState({});
     const [isLoaded, setIsLoaded] = React.useState(false);
     const [deviceTree, setDeviceTree] = React.useState({});
+    const [selectedDeviceId, setSelectedDeviceId] = React.useState(0);
 
     React.useEffect(() => {
         let api = new FibaroApi();
@@ -24,31 +25,35 @@ export default props => {
                 })
                 .filter(r => r.devices?.length > 0);
             setDeviceTree(tree);
+            setSelectedDeviceId(tree[0].devices[0].id);
             setIsLoaded(true);
         });
-    });
-    
+    }, []);
+
+    const handleSelected = (deviceId) => {
+        setSelectedDeviceId(deviceId);
+    }
+
     return (
         <Container>
             <Paper></Paper>
-            <Grid container spacing={3}>
-                <Grid item xs={3}>
-                    <Paper>
-                        {isLoaded
-                        ? <EnergyNavigator data={deviceTree}/>
-                        : null
-                        }
-                        
-                    </Paper>
-                </Grid>
+            {isLoaded
+                ? <Grid container spacing={3}>
+                    <Grid item xs={3}>
+                        <Paper>
+                            <EnergyNavigator data={deviceTree} onSelected={handleSelected} />
+                        </Paper>
+                    </Grid>
 
-                <Grid item xs={3}>
-                    <Paper>
-                        <Dashboard/>
-                    </Paper>
-                </Grid>
+                    <Grid item xs={9}>
+                        <Paper>
+                            <Dashboard deviceId={selectedDeviceId} />
+                        </Paper>
+                    </Grid>
 
-            </Grid>
+                </Grid>
+                : null
+            }
         </Container>
     );
 };
