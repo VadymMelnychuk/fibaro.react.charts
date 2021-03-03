@@ -39,12 +39,14 @@ export default props => {
         let api = new FibaroApi();
         api.GetInterfaceData().then(data => {
             let tree = data.rooms
+                .sort((r1, r2) => r1.name > r2.name ? 1 : -1)
                 .map(r => {
                     let o = Object.assign({}, r);
                     o["devices"] = data.devices.filter(d => d.roomID === r.id && d.interfaces?.includes("energy"));
                     return o;
                 })
                 .filter(r => r.devices?.length > 0);
+            tree["icons"] = { ...data.icons };
             setDeviceTree(tree);
             setSelectedDeviceId(tree[0].devices[0].id);
             setIsLoaded(true);

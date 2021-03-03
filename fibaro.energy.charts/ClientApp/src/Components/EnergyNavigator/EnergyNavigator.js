@@ -33,6 +33,10 @@ const useStyles = makeStyles((theme) => ({
     icon: {
         minWidth: theme.spacing(4),
     },
+    iconImage: {
+        width: '24px',
+        height: '24px'
+    },
     nested: {
         paddingLeft: theme.spacing(4),
     },
@@ -77,7 +81,7 @@ export default props => {
                         <React.Fragment key={r.id} >
                             <ListItem key={r.id} button onClick={() => handleClick(r.id)} className={classes.listItem} >
                                 <ListItemIcon className={classes.icon}>
-                                    <img src={`fibaro/image?path=fibaro/icons/rooms/${r.icon}.png`} width="24px" height="24px" />
+                                    <img src={`fibaro/image?path=fibaro/icons/rooms/${r.icon}.png`} className={classes.iconImage}/>
                                 </ListItemIcon>
                                 <ListItemText primary={r.name} />
                                 {open[r.id] ? <ExpandLess /> : <ExpandMore />}
@@ -85,8 +89,13 @@ export default props => {
                             <Collapse in={open[r.id]} timeout="auto" unmountOnExit>
                                 <List component="div" >
                                     {
-                                        r.devices.map(d =>
-                                            <ListItem
+                                        r.devices.map(d => {
+                                            const iconId = d.properties.deviceIcon;
+                                            const setName = data.icons.device.find(ic => ic.id == iconId).iconSetName;
+                                            const deviceIcon = (d.interfaces.includes("deviceGrouping") || d.interfaces.includes("fibaroBreach"))
+                                                ? `${setName}/${setName}0.png`
+                                                : `${setName}/${setName}.png`;
+                                            return (<ListItem
                                                 key={d.id}
                                                 button
                                                 className={`${classes.nested} ${classes.listItem}`}
@@ -95,9 +104,12 @@ export default props => {
                                                     setSelected(d.id);
                                                     onSelected(d.id);
                                                 }}>
+                                                <ListItemIcon className={classes.icon}>
+                                                    <img src={`fibaro/image?path=/fibaro/icons/${deviceIcon}`} className={classes.iconImage} />
+                                                </ListItemIcon>
                                                 <ListItemText primary={d.name} />
-                                            </ListItem>
-                                        )
+                                            </ListItem>)
+                                        })
                                     }
                                 </List>
                             </Collapse>
