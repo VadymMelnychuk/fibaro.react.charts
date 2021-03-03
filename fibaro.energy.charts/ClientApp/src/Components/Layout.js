@@ -1,22 +1,43 @@
 import React from 'react';
-//import NavMenu from './NavMenu';
-import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
 import { Container, Paper } from '@material-ui/core';
 import EnergyNavigator from './EnergyNavigator/EnergyNavigator';
 import Dashboard from './Dashboard/Dashboard';
 import FibaroApi from '../Api/FibaroApi';
 
+const useStyles = makeStyles((theme) => ({
+    container: {
+    },
+    root: {
+        display: 'flex',
+    },
+    paperTop: {
+        height: 70,
+        width: '100%',
+        paddingBottom: theme.spacing(2),
+        marginBottom: theme.spacing(1)
+    },
+    paperNavigator: {
+        height: '100%'
+    },
+    paperDashboard: {
+        width: '100%'
+    },
+    content: {
+        flexGrow: 1,
+    },
+}));
+
 export default props => {
-    //const user = localStorage.getItem('user');
-    //const [interfaceData, setInterfaceData] = React.useState({});
     const [isLoaded, setIsLoaded] = React.useState(false);
     const [deviceTree, setDeviceTree] = React.useState({});
     const [selectedDeviceId, setSelectedDeviceId] = React.useState(0);
 
+    const classes = useStyles();
+
     React.useEffect(() => {
         let api = new FibaroApi();
         api.GetInterfaceData().then(data => {
-            //setInterfaceData(data);
             let tree = data.rooms
                 .map(r => {
                     let o = Object.assign({}, r);
@@ -35,25 +56,20 @@ export default props => {
     }
 
     return (
-        <Container>
-            <Paper></Paper>
+        <Container maxWidth={false} className={classes.container}>
             {isLoaded
-                ? <Grid container spacing={3}>
-                    <Grid item xs={3}>
-                        <Paper>
-                            <EnergyNavigator data={deviceTree} onSelected={handleSelected} />
-                        </Paper>
-                    </Grid>
+                ? <div className={classes.root}>
+                    <EnergyNavigator data={deviceTree} onSelected={handleSelected} />
 
-                    <Grid item xs={9}>
-                        <Paper>
+                    <main className={classes.content}>
+                        <Paper className={classes.paperDashboard}>
+                            <Paper className={classes.paperTop}></Paper>
                             <Dashboard deviceId={selectedDeviceId} />
                         </Paper>
-                    </Grid>
-
-                </Grid>
+                    </main>
+                </div>
                 : null
             }
-        </Container>
+        </Container >
     );
 };

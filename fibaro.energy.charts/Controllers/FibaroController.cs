@@ -29,5 +29,23 @@
             var respBody = await resp.Content.ReadAsStringAsync();
             return respBody;
         }
+
+        [HttpGet("image")]
+        public async Task<IActionResult> GetImage([FromQuery] string path)
+        {
+            _logger.LogInformation($"GetImage. Request url: {path}");
+
+            var model = new ProxyRequestModel
+            {
+                Method = "GET",
+                Url = path
+            };
+
+            var resp = await httpClient.Query(model);
+            resp.EnsureSuccessStatusCode();
+
+            var respBody = await resp.Content.ReadAsStreamAsync();
+            return Ok(respBody);
+        }
     }
 }

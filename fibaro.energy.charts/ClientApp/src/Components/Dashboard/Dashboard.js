@@ -1,59 +1,50 @@
 import React from 'react';
-import {
-    BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-} from 'recharts';
-import FibaroApi from '../../Api/FibaroApi';
+import { makeStyles } from '@material-ui/core/styles';
+import DashboardHourly from './DashboardHourly';
+import DashboardDaily from './DashboardDaily';
+import DashboardMonthly from './DashboardMonthly';
+import RangeSelector from './RangeSelector';
 
+const useStyles = makeStyles((theme) => ({
+    dashboardRoot: {
+        height: 500,
+        width: '100%',
+    },
+    selectedDashboard: {
+        paddingLeft: theme.spacing.unit * 2,
+        paddingRight: theme.spacing.unit * 2,
+    }
+  }));
+
+const selectedDashboard = (id, props) => {
+    switch (id) {
+        case 0:
+            return (<DashboardHourly {...props}/>                    )
+            break;
+    
+        case 1:
+            return (<DashboardDaily {...props}/>)
+            break;
+
+        case 2:
+            return (<DashboardMonthly {...props} />)
+            break;
+    }
+}  
 export default props => {
-    const {deviceId} = props; 
-    const [data, setData] = React.useState({});
-    const [isLoaded, setIsLoaded] = React.useState(false);
+    const classes = useStyles();
+    const [selectedRange, setSelectedRange] = React.useState(0);
 
-    React.useEffect(async () => {
-        let api = new FibaroApi();
-        let requestedData = [];
-
-        for(let index = 24; index > 0; index--) {
-            let from = new Date();
-            from.setHours(from.getHours() - index, 0, 0, 0);
-            let to = new Date(from.getTime());
-            to.setHours(to.getHours() + 1);
-            const fromR = from.getTime() / 1000;
-            const toR = to.getTime() / 1000;
-
-            let loadedData = await api.GetEnergyData(fromR, toR, deviceId);
-            let item = {
-                hour: `${from.getHours()}:00`,
-                energy: loadedData.length ? loadedData[0].kWh : 0
-            }
-            requestedData.push(item);
-        }
-
-        setData(requestedData);
-        setIsLoaded(true);
-    }, [deviceId]);
+    const handleRangeSelect = (id) => {
+        setSelectedRange(id);
+    }
 
     return (
-        <div>
-            {
-                isLoaded
-                    ?
-                    <BarChart width={700} height={400}
-                        data={data}
-                        margin={{
-                            top: 5, right: 30, left: 20, bottom: 5,
-                        }
-                        }
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="hour" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="energy" fill="#8884d8" />
-                    </BarChart >
-                    : <React.Fragment />
-            }
+        <div className={classes.dashboardRoot}>
+            <RangeSelector selectedId={selectedRange} onSelect={handleRangeSelect}/>
+            <div className={classes.selectedDashboard}>
+                {selectedDashboard(selectedRange, props)}
+            </div>
         </div>
     )
 };
