@@ -52,7 +52,9 @@ export default props => {
     const initialOpens = data.reduce((res, d) => { res[d.id] = true; return res; }, {});
 
     const [open, setOpen] = React.useState(initialOpens);
-    const [selected, setSelected] = React.useState(data[0].devices[0].id);
+    let savedDevice = window.localStorage.getItem('deviceId');
+    savedDevice = isNaN(savedDevice) ? data[0].devices[0].id : Number.parseInt(savedDevice);
+    const [selected, setSelected] = React.useState(savedDevice);
 
     const handleClick = (id) => {
         let newOpen = { ...open }
